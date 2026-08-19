@@ -1,4 +1,4 @@
-FROM runpod/pytorch:2.4.0-py3.12-cuda12.4.1-devel-ubuntu22.04
+FROM pytorch/pytorch:2.4.0-cuda12.4-cudnn9-devel
 
 RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg curl && \
     rm -rf /var/lib/apt/lists/*

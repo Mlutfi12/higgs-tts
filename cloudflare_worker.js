@@ -7,7 +7,7 @@
  *
  * Set these in Worker → Settings → Variables:
  *   RUNPOD_API_KEY   — your RunPod API key
- *   RUNPOD_ENDPOINT  — endpoint ID (e.g. "abc123xyz")
+ *   RUNPOD_ENDPOINT  — toj87my9t09dn4
  */
 
 export default {
