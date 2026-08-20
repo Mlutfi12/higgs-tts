@@ -34,34 +34,44 @@ MODEL_ID  = "bosonai/higgs-audio-v3-tts-4b"
 
 # ── Start vllm-omni once per worker ──────────────────────────────────────────
 
+_vllm_proc = None
+
 def start_vllm():
+    global _vllm_proc
     cmd = [
         "vllm-omni", "serve", MODEL_ID,
         "--omni",
         "--port", "8007",
         "--host", "127.0.0.1",
         "--stage-init-timeout", "1800",
-        "--gpu-memory-utilization", "0.75",   # safe for both 24GB and 48GB GPUs
+        "--gpu-memory-utilization", "0.75",
         "--max-model-len", "32768",
         "--dtype", "bfloat16",
-        # --enforce-eager not needed on A40
     ]
     log.info("Starting vllm-omni...")
-    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    return proc
+    _vllm_proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    return _vllm_proc
 
 
-def wait_for_vllm(timeout=600):
+def wait_for_vllm(timeout=900):
     deadline = time.time() + timeout
+    last_log = time.time()
     while time.time() < deadline:
+        # Detect if vllm-omni process died
+        if _vllm_proc and _vllm_proc.poll() is not None:
+            raise RuntimeError(f"vllm-omni exited unexpectedly (code {_vllm_proc.poll()})")
         try:
-            r = httpx.get("http://localhost:8007/health", timeout=3)
+            r = httpx.get("http://localhost:8007/v1/models", timeout=5)
             if r.status_code == 200:
                 log.info("vllm-omni ready")
                 return True
         except Exception:
             pass
-        time.sleep(3)
+        if time.time() - last_log > 30:
+            elapsed = int(timeout - (deadline - time.time()))
+            log.info(f"Waiting for vllm-omni... {elapsed}s elapsed")
+            last_log = time.time()
+        time.sleep(5)
     raise RuntimeError("vllm-omni did not become ready in time")
 
 
