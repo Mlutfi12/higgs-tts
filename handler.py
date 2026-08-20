@@ -50,6 +50,14 @@ def start_vllm():
     ]
     log.info("Starting vllm-omni...")
     _vllm_proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+    # Stream vllm-omni output to our logs in background thread
+    def _stream_logs():
+        for line in _vllm_proc.stdout:
+            log.info(f"[vllm] {line.decode(errors='replace').rstrip()}")
+    import threading
+    threading.Thread(target=_stream_logs, daemon=True).start()
+
     return _vllm_proc
 
 
