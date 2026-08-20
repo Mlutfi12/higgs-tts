@@ -65,11 +65,18 @@ def wait_for_vllm(timeout=180):
     raise RuntimeError("vllm-omni did not become ready in time")
 
 
-log.info("Worker startup — launching vllm-omni")
-_vllm_proc = start_vllm()
-wait_for_vllm()
-_load_charma()
-log.info("Worker ready")
+_initialized = False
+
+def _ensure_ready():
+    global _initialized
+    if _initialized:
+        return
+    log.info("First request — starting vllm-omni")
+    start_vllm()
+    wait_for_vllm()
+    _load_charma()
+    _initialized = True
+    log.info("Worker ready")
 
 
 # ── Handler ───────────────────────────────────────────────────────────────────
@@ -119,6 +126,7 @@ async def _run_tts(body: dict) -> bytes:
 
 
 def handler(job):
+    _ensure_ready()
     body = job.get("input", {})
     try:
         mp3 = asyncio.run(_run_tts(body))
