@@ -51,7 +51,7 @@ def start_vllm():
     return proc
 
 
-def wait_for_vllm(timeout=180):
+def wait_for_vllm(timeout=600):
     deadline = time.time() + timeout
     while time.time() < deadline:
         try:
