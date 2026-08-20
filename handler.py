@@ -41,7 +41,7 @@ def start_vllm():
         "--port", "8007",
         "--host", "127.0.0.1",
         "--stage-init-timeout", "1800",
-        "--gpu-memory-utilization", "0.85",   # 0.65 on RTX 3090; A40 has 48GB so 0.85 is safe
+        "--gpu-memory-utilization", "0.75",   # safe for both 24GB and 48GB GPUs
         "--max-model-len", "32768",
         "--dtype", "bfloat16",
         # --enforce-eager not needed on A40
