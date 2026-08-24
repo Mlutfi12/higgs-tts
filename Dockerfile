@@ -15,7 +15,8 @@ RUN pip install --no-cache-dir \
 COPY proxy_server.py /app/proxy_server.py
 COPY handler.py      /app/handler.py
 
-ENV HF_HOME=/runpod-volume/hf_cache
-ENV TRANSFORMERS_CACHE=/runpod-volume/hf_cache
+ENV HF_HOME=/tmp/hf_cache
+ENV TRANSFORMERS_CACHE=/tmp/hf_cache
+ENV HF_HUB_DISABLE_XET=1
 
 CMD ["python", "-u", "/app/handler.py"]
