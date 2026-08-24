@@ -44,6 +44,7 @@ def start_vllm():
         "--port", "8007",
         "--host", "127.0.0.1",
         "--stage-init-timeout", "1800",
+        "--enforce-eager",
         "--gpu-memory-utilization", "0.75",
         "--max-model-len", "32768",
         "--dtype", "bfloat16",
