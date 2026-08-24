@@ -143,11 +143,12 @@ async def _run_tts(body: dict) -> bytes:
     return wav_to_mp3(merged)
 
 
-def handler(job):
-    _ensure_ready()
+async def handler(job):
+    loop = asyncio.get_event_loop()
+    await loop.run_in_executor(None, _ensure_ready)
     body = job.get("input", {})
     try:
-        mp3 = asyncio.run(_run_tts(body))
+        mp3 = await _run_tts(body)
         return {
             "audio_b64":    base64.b64encode(mp3).decode(),
             "content_type": "audio/mpeg",
