@@ -218,7 +218,7 @@ def trim_chunk_audio(audio, framerate):
     # immediately before the EOS silence. A fixed 280ms backward trim from the silence
     # boundary removes it reliably for all languages, voices, and content — no amplitude
     # heuristic needed. Cost: ~40ms of trailing speech tail (inaudible in practice).
-    eos_cut = max(0, eos_cut - int(framerate * 0.32))
+    eos_cut = max(0, eos_cut - int(framerate * 0.22))
 
     return audio[:eos_cut]
 
@@ -377,9 +377,8 @@ async def audio_speech(request: Request):
     base["model"]           = "bosonai/higgs-audio-v3-tts-4b"
     base["response_format"] = "wav"
     base["seed"]            = 42
-    base["temperature"]     = base.get("temperature", 0.3)
+    base["temperature"]     = base.get("temperature", 0.4)
     base["top_k"]           = base.get("top_k", 10)
-    base["repetition_penalty"] = base.get("repetition_penalty", 1.3)
     base["emotion"]         = base.get("emotion", "neutral")
     base["expressiveness"]  = base.get("expressiveness", 0.1)
     base["speed"]           = base.get("speed", 1.0)
