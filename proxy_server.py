@@ -218,7 +218,7 @@ def trim_chunk_audio(audio, framerate):
     # immediately before the EOS silence. A fixed 280ms backward trim from the silence
     # boundary removes it reliably for all languages, voices, and content — no amplitude
     # heuristic needed. Cost: ~40ms of trailing speech tail (inaudible in practice).
-    eos_cut = max(0, eos_cut - int(framerate * 0.22))
+    eos_cut = max(0, eos_cut - int(framerate * 0.25))
 
     return audio[:eos_cut]
 
@@ -377,7 +377,7 @@ async def audio_speech(request: Request):
     base["model"]           = "bosonai/higgs-audio-v3-tts-4b"
     base["response_format"] = "wav"
     base["seed"]            = 42
-    base["temperature"]     = base.get("temperature", 0.4)
+    base["temperature"]     = base.get("temperature", 0.5)
     base["top_k"]           = base.get("top_k", 10)
     base["emotion"]         = base.get("emotion", "neutral")
     base["expressiveness"]  = base.get("expressiveness", 0.1)
@@ -393,12 +393,8 @@ async def audio_speech(request: Request):
             base.pop("voice", None)
             log.warning("charma not loaded, proceeding without ref voice")
 
-    sem = asyncio.Semaphore(2)
-    async def gen_limited(chunk_text, idx):
-        async with sem:
-            return await gen_one({**base, "input": chunk_text}, auth, idx)
     results = await asyncio.gather(*[
-        gen_limited(c, i) for i, c in enumerate(chunks)
+        gen_one({**base, "input": c}, auth, i) for i, c in enumerate(chunks)
     ])
 
     good = [r for r in results if r]
