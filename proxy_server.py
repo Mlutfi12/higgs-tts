@@ -25,7 +25,7 @@ def _load_charma():
     log.info(f"charma voice ready: {len(_charma_ref_audio)} chars")
 
 # ── Chunking ──────────────────────────────────────────────────────────────────
-MAX_CHUNK   = 380   # soft limit; ~25s audio/chunk max — model attention fails above ~30s
+MAX_CHUNK   = 250   # soft limit; ~16s audio/chunk max — shorter chunks = fewer EOS artifacts
 
 # ── Join ─────────────────────────────────────────────────────────────────────
 GAP_MS      = 150   # silence gap between chunks (ms) — natural inter-sentence pause
