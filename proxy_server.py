@@ -393,9 +393,10 @@ async def audio_speech(request: Request):
             base.pop("voice", None)
             log.warning("charma not loaded, proceeding without ref voice")
 
-    results = await asyncio.gather(*[
-        gen_one({**base, "input": c}, auth, i) for i, c in enumerate(chunks)
-    ])
+    results = []
+    for i, c in enumerate(chunks):
+        r = await gen_one({**base, "input": c}, auth, i)
+        results.append(r)
 
     good = [r for r in results if r]
     log.info(f"chunks done: {len(good)}/{len(chunks)} succeeded")
