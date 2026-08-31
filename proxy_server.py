@@ -377,8 +377,9 @@ async def audio_speech(request: Request):
     base["model"]           = "bosonai/higgs-audio-v3-tts-4b"
     base["response_format"] = "wav"
     base["seed"]            = 42
-    base["temperature"]     = base.get("temperature", 0.5)
+    base["temperature"]     = base.get("temperature", 0.3)
     base["top_k"]           = base.get("top_k", 10)
+    base["repetition_penalty"] = base.get("repetition_penalty", 1.3)
     base["emotion"]         = base.get("emotion", "neutral")
     base["expressiveness"]  = base.get("expressiveness", 0.1)
     base["speed"]           = base.get("speed", 1.0)
