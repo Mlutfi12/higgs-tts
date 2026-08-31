@@ -25,7 +25,7 @@ def _load_charma():
     log.info(f"charma voice ready: {len(_charma_ref_audio)} chars")
 
 # ── Chunking ──────────────────────────────────────────────────────────────────
-MAX_CHUNK   = 250   # soft limit; ~16s audio/chunk max — shorter chunks = fewer EOS artifacts
+MAX_CHUNK   = 380   # soft limit; ~25s audio/chunk max — model attention fails above ~30s
 
 # ── Join ─────────────────────────────────────────────────────────────────────
 GAP_MS      = 150   # silence gap between chunks (ms) — natural inter-sentence pause
@@ -393,8 +393,12 @@ async def audio_speech(request: Request):
             base.pop("voice", None)
             log.warning("charma not loaded, proceeding without ref voice")
 
+    sem = asyncio.Semaphore(2)
+    async def gen_limited(chunk_text, idx):
+        async with sem:
+            return await gen_one({**base, "input": chunk_text}, auth, idx)
     results = await asyncio.gather(*[
-        gen_one({**base, "input": c}, auth, i) for i, c in enumerate(chunks)
+        gen_limited(c, i) for i, c in enumerate(chunks)
     ])
 
     good = [r for r in results if r]
