@@ -218,7 +218,7 @@ def trim_chunk_audio(audio, framerate):
     # immediately before the EOS silence. A fixed 280ms backward trim from the silence
     # boundary removes it reliably for all languages, voices, and content — no amplitude
     # heuristic needed. Cost: ~40ms of trailing speech tail (inaudible in practice).
-    eos_cut = max(0, eos_cut - int(framerate * 0.45))
+    eos_cut = max(0, eos_cut - int(framerate * 0.32))
 
     return audio[:eos_cut]
 
